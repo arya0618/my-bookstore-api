@@ -3,6 +3,7 @@ package users // data access object model
 import (
 	"fmt"
 
+	"github.com/arya0618/my-bookstore-api/datasources/mysql/users_db"
 	"github.com/arya0618/my-bookstore-api/utils/date"
 	"github.com/arya0618/my-bookstore-api/utils/errors"
 )
@@ -14,6 +15,10 @@ var (
 
 //Get is method
 func (user *User) Get() *errors.RestErr {
+	if err := users_db.Client.Ping(); err != nil {
+		fmt.Println("---in get()---", err)
+		panic(err)
+	}
 	result := userDB[user.ID]
 	if result == nil {
 		//sprinf for formatting
