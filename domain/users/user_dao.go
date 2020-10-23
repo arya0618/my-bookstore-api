@@ -9,33 +9,29 @@ import (
 	"github.com/arya0618/my-bookstore-api/utils/errors"
 )
 
-// mocke db
-var (
-	userDB = make(map[int64]*User)
-)
-
 const (
 	uniqueIndexEmail = "email"
 	queryInsertUser  = "INSERT INTO users(first_name,last_name,email,date_created) VALUES (?,?,?,?);"
+	queryGetUser     = "SELECT * from users WHERE id=? ;"
+	errNoUserRow     = "no rows in result set"
 )
 
 //Get is method
 func (user *User) Get() *errors.RestErr {
-	if err := users_db.Client.Ping(); err != nil {
-		fmt.Println("---in get()---", err)
-		panic(err)
+	stmt, err := users_db.Client.Prepare(queryGetUser)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
 	}
-	result := userDB[user.ID]
-	if result == nil {
-		//sprinf for formatting
-		return errors.NewNotfoundError(fmt.Sprintf("user %d not found", user.ID))
+	defer stmt.Close()
+	result := stmt.QueryRow(user.ID)
+	if err := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); err != nil {
+		if strings.Contains(err.Error(), errNoUserRow) {
+			return errors.NewBadRequestError(fmt.Sprintf("User with id : %d not found", user.ID))
+		}
+		fmt.Println(err)
+		return errors.NewInternalServerError(fmt.Sprintf("error when trying to get user %d :%s", user.ID, err.Error()))
+
 	}
-	user.ID = result.ID
-	user.FirstName = result.FirstName
-	user.LastName = result.LastName
-	user.Email = result.Email
-	user.DateCreated = result.DateCreated
-	fmt.Println("get--", user)
 	return nil
 }
 
