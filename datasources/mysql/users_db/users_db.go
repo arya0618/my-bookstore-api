@@ -27,8 +27,8 @@ var (
 )
 
 func init() {
-	//datasourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s","admin", "pass123", "127.0.0.1:3306", "users_db")
-	datasourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, host, schema) //setting env variable becz not secure to add this code in github
+	datasourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", "admin", "pass123", "127.0.0.1:3306", "users_db")
+	//datasourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, host, schema) //setting env variable becz not secure to add this code in github
 	//fmt.Println("---->>", datasourceName)
 	var err error
 	Client, err = sql.Open("mysql", datasourceName)
