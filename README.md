@@ -1,1 +1,1 @@
-# my-bookstore-api
+# APIs for Books store application
